@@ -151,10 +151,22 @@ WaypointMobilityModel::Update (void) const
       newWaypoint = true;
 
       const double t_span = (m_next.time - m_current.time).GetSeconds ();
-      NS_ASSERT (t_span > 0);
-      m_velocity.x = (m_next.position.x - m_current.position.x) / t_span;
-      m_velocity.y = (m_next.position.y - m_current.position.y) / t_span;
-      m_velocity.z = (m_next.position.z - m_current.position.z) / t_span;
+
+      NS_ASSERT_MSG ((t_span > 0) || (t_span == 0 && CalculateDistance (m_next.position, m_current.position) == 0),
+                     "Error: can not move between two points in no time: distance: " << CalculateDistance (m_next.position, m_current.position));
+
+      if (t_span > 0)
+        {
+          m_velocity.x = (m_next.position.x - m_current.position.x) / t_span;
+          m_velocity.y = (m_next.position.y - m_current.position.y) / t_span;
+          m_velocity.z = (m_next.position.z - m_current.position.z) / t_span;
+        }
+      else
+        {
+          m_velocity.x = 0;
+          m_velocity.y = 0;
+          m_velocity.z = 0;
+        }
     }
 
   if ( now > m_current.time ) // Won't ever be less, but may be equal

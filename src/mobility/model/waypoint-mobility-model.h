@@ -107,7 +107,7 @@ public:
    * current position with a velocity of zero.
    *
    */
-  void AddWaypoint (const Waypoint &waypoint);
+  virtual void AddWaypoint (const Waypoint &waypoint);
 
   /**
    * Get the waypoint that this object is traveling towards.
@@ -128,13 +128,15 @@ public:
    */
   void EndMobility (void);
 
-private:
-  friend class ::WaypointMobilityModelNotifyTest; // To allow Update() calls and access to m_current
-
+protected:
   /**
    * Update the underlying state corresponding to the stored waypoints
    */
-  void Update (void) const;
+  virtual void Update (void) const;
+
+private:
+  friend class ::WaypointMobilityModelNotifyTest; // To allow Update() calls and access to m_current
+
   /**
    * \brief The dispose method.
    * 
