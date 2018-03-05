@@ -115,6 +115,13 @@ RvBatteryModel::GetInitialEnergy (void) const
 }
 
 double
+RvBatteryModel::GetEnergyCapacity (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_alpha * GetSupplyVoltage ();
+}
+
+double
 RvBatteryModel::GetSupplyVoltage (void) const
 {
   NS_LOG_FUNCTION (this);

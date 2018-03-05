@@ -49,6 +49,13 @@ public:
   virtual double GetInitialEnergy (void) const;
 
   /**
+   * \return The source energy capacity, in Joules.
+   *
+   * Implements GetEnergyCapacity.
+   */
+  virtual double GetEnergyCapacity (void) const;
+
+  /**
    * \returns Supply voltage at the energy source.
    *
    * Implements GetSupplyVoltage.
@@ -80,8 +87,19 @@ public:
    * Sets initial energy stored in the energy source. Note that initial energy
    * is assumed to be set before simulation starts and is set only once per
    * simulation.
+   * If the initial energy is not set, it is assumed to be equal to
+   * the source energy capacity.
    */
   void SetInitialEnergy (double initialEnergyJ);
+
+  /**
+   * \param The source energy capacity, in Joules.
+   *
+   * Sets the energy capacity of the source.
+   * If the energy capacity is not set, it is assumed to be equal to
+   * the initial energy.
+   */
+   void SetEnergyCapacity (double energyCapacityJ);
 
   /**
    * \param supplyVoltageV Supply voltage at the energy source, in Volts.
@@ -137,6 +155,7 @@ private:
 
 private:
   double m_initialEnergyJ;                // initial energy, in Joules
+  double m_energyCapacityJ;               // energy capacity, in Joules
   double m_supplyVoltageV;                // supply voltage, in Volts
   double m_lowBatteryTh;                  // low battery threshold, as a fraction of the initial energy
   double m_highBatteryTh;                 // high battery threshold, as a fraction of the initial energy

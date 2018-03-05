@@ -41,11 +41,17 @@ LiIonEnergySource::GetTypeId (void)
     .SetGroupName ("Energy")
     .AddConstructor<LiIonEnergySource> ()
     .AddAttribute ("LiIonEnergySourceInitialEnergyJ",
-                   "Initial energy stored in basic energy source.",
-                   DoubleValue (31752.0),  // in Joules
+                   "Initial energy stored in LiIon energy source.",
+                   DoubleValue (0),  // in Joules
                    MakeDoubleAccessor (&LiIonEnergySource::SetInitialEnergy,
                                        &LiIonEnergySource::GetInitialEnergy),
                    MakeDoubleChecker<double> ())
+    .AddAttribute ("LiIonEnergySourceCapacityJ",
+		   "Energy capacity that can be stored in LiIon energy source.",
+		   DoubleValue (0),  // in Joules
+		   MakeDoubleAccessor (&LiIonEnergySource::SetEnergyCapacity,
+				       &LiIonEnergySource::GetEnergyCapacity),
+	           MakeDoubleChecker<double> ())
     .AddAttribute ("LiIonEnergyLowBatteryThreshold",
                    "Low battery threshold for LiIon energy source.",
                    DoubleValue (0.10), // as a fraction of the initial energy
@@ -112,7 +118,8 @@ LiIonEnergySource::GetTypeId (void)
 }
 
 LiIonEnergySource::LiIonEnergySource ()
-  : m_drainedCapacity (0.0),
+  : m_energyCapacityJ (0.0),
+    m_drainedCapacity (0.0),
     m_lastUpdateTime (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
@@ -127,10 +134,14 @@ void
 LiIonEnergySource::SetInitialEnergy (double initialEnergyJ)
 {
   NS_LOG_FUNCTION (this << initialEnergyJ);
-  NS_ASSERT (initialEnergyJ >= 0);
+  NS_ASSERT (initialEnergyJ <= m_energyCapacityJ || m_energyCapacityJ == 0);
   m_initialEnergyJ = initialEnergyJ;
   // set remaining energy to be initial energy
   m_remainingEnergyJ = m_initialEnergyJ;
+  if(m_energyCapacityJ == 0)
+    {
+      m_energyCapacityJ = m_initialEnergyJ;
+    }
 }
 
 double
@@ -184,6 +195,10 @@ LiIonEnergySource::GetEnergyFraction (void)
   NS_LOG_FUNCTION (this);
   // update energy source to get the latest remaining energy.
   UpdateEnergySource ();
+  if(m_energyCapacityJ == 0)
+    {
+      return 0;
+    }
   return m_remainingEnergyJ / m_initialEnergyJ;
 }
 
@@ -223,6 +238,14 @@ LiIonEnergySource::UpdateEnergySource (void)
     }
 
   m_energyUpdateEvent.Cancel ();
+  if(m_energyCapacityJ == 0)
+    {
+      m_energyCapacityJ = m_initialEnergyJ;
+    }
+  if(m_initialEnergyJ == 0)
+    {
+      m_initialEnergyJ = m_energyCapacityJ;
+    }
 
   CalculateRemainingEnergy ();
 
@@ -237,6 +260,27 @@ LiIonEnergySource::UpdateEnergySource (void)
   m_energyUpdateEvent = Simulator::Schedule (m_energyUpdateInterval,
                                              &LiIonEnergySource::UpdateEnergySource,
                                              this);
+}
+
+void
+LiIonEnergySource::SetEnergyCapacity (double energyCapacityJ)
+{
+  NS_LOG_FUNCTION (this << energyCapacityJ);
+  NS_ASSERT (energyCapacityJ >= 0);
+  NS_ASSERT (energyCapacityJ >= m_initialEnergyJ || energyCapacityJ == 0);
+  m_energyCapacityJ = energyCapacityJ;
+  if(m_initialEnergyJ == 0)
+    {
+      m_initialEnergyJ = m_energyCapacityJ;
+      m_remainingEnergyJ = m_initialEnergyJ;
+    }
+}
+
+double
+LiIonEnergySource::GetEnergyCapacity () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_energyCapacityJ;
 }
 
 /*
@@ -277,15 +321,16 @@ LiIonEnergySource::CalculateRemainingEnergy (void)
   // energy = current * voltage * time
   double energyToDecreaseJ = totalCurrentA * m_supplyVoltageV * duration.GetSeconds ();
 
-  if (m_remainingEnergyJ < energyToDecreaseJ) 
+  // handles consuming energy below the low battery threshold
+  if (m_remainingEnergyJ <= m_energyCapacityJ * m_lowBatteryTh && energyToDecreaseJ > 0)
     {
-      m_remainingEnergyJ = 0; // energy never goes below 0
+      energyToDecreaseJ = 0;
     } 
-  else 
+  if (m_remainingEnergyJ >= m_energyCapacityJ && energyToDecreaseJ < 0)
     {
-      m_remainingEnergyJ -= energyToDecreaseJ;
+      energyToDecreaseJ = 0;
     }  
-
+  m_remainingEnergyJ -= energyToDecreaseJ;
   m_drainedCapacity += (totalCurrentA * duration.GetSeconds () / 3600);
   // update the supply voltage
   m_supplyVoltageV = GetVoltage (totalCurrentA);

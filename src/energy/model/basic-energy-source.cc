@@ -40,10 +40,16 @@ BasicEnergySource::GetTypeId (void)
     .AddConstructor<BasicEnergySource> ()
     .AddAttribute ("BasicEnergySourceInitialEnergyJ",
                    "Initial energy stored in basic energy source.",
-                   DoubleValue (10),  // in Joules
+                   DoubleValue (0),  // in Joules
                    MakeDoubleAccessor (&BasicEnergySource::SetInitialEnergy,
                                        &BasicEnergySource::GetInitialEnergy),
                    MakeDoubleChecker<double> ())
+    .AddAttribute ("BasicEnergySourceCapacityJ",
+	               "Energy capacity that can be stored in basic energy source.",
+				   DoubleValue (0),  // in Joules
+				   MakeDoubleAccessor (&BasicEnergySource::SetEnergyCapacity,
+						   	   	   	   &BasicEnergySource::GetEnergyCapacity),
+				   MakeDoubleChecker<double> ())
     .AddAttribute ("BasicEnergySupplyVoltageV",
                    "Initial supply voltage for basic energy source.",
                    DoubleValue (3.0), // in Volts
@@ -77,6 +83,7 @@ BasicEnergySource::GetTypeId (void)
 BasicEnergySource::BasicEnergySource ()
 {
   NS_LOG_FUNCTION (this);
+  m_energyCapacityJ = 0;
   m_lastUpdateTime = Seconds (0.0);
   m_depleted = false;
 }
@@ -91,8 +98,13 @@ BasicEnergySource::SetInitialEnergy (double initialEnergyJ)
 {
   NS_LOG_FUNCTION (this << initialEnergyJ);
   NS_ASSERT (initialEnergyJ >= 0);
+  NS_ASSERT (initialEnergyJ <= m_energyCapacityJ || m_energyCapacityJ == 0);
   m_initialEnergyJ = initialEnergyJ;
   m_remainingEnergyJ = m_initialEnergyJ;
+  if(m_energyCapacityJ == 0)
+    {
+      m_energyCapacityJ = m_initialEnergyJ;
+    }
 }
 
 void
@@ -145,7 +157,11 @@ BasicEnergySource::GetEnergyFraction (void)
   NS_LOG_FUNCTION (this);
   // update energy source to get the latest remaining energy.
   UpdateEnergySource ();
-  return m_remainingEnergyJ / m_initialEnergyJ;
+  if(m_energyCapacityJ == 0)
+    {
+      return 0;
+    }
+  return m_remainingEnergyJ / m_energyCapacityJ;
 }
 
 void
@@ -161,6 +177,14 @@ BasicEnergySource::UpdateEnergySource (void)
     }
 
   m_energyUpdateEvent.Cancel ();
+  if(m_energyCapacityJ == 0)
+    {
+      m_energyCapacityJ = m_initialEnergyJ;
+    }
+  if(m_initialEnergyJ == 0)
+    {
+      m_initialEnergyJ = m_energyCapacityJ;
+    }
 
   double remainingEnergy = m_remainingEnergyJ;
   CalculateRemainingEnergy ();
@@ -185,6 +209,27 @@ BasicEnergySource::UpdateEnergySource (void)
   m_energyUpdateEvent = Simulator::Schedule (m_energyUpdateInterval,
                                              &BasicEnergySource::UpdateEnergySource,
                                              this);
+}
+
+void
+BasicEnergySource::SetEnergyCapacity (double energyCapacityJ)
+{
+  NS_LOG_FUNCTION (this << energyCapacityJ);
+  NS_ASSERT (energyCapacityJ >= 0);
+  NS_ASSERT (energyCapacityJ >= m_initialEnergyJ || energyCapacityJ == 0);
+  m_energyCapacityJ = energyCapacityJ;
+  if(m_initialEnergyJ == 0)
+    {
+      m_initialEnergyJ = m_energyCapacityJ;
+      m_remainingEnergyJ = m_initialEnergyJ;
+    }
+}
+
+double
+BasicEnergySource::GetEnergyCapacity () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_energyCapacityJ;
 }
 
 /*
@@ -230,7 +275,16 @@ BasicEnergySource::CalculateRemainingEnergy (void)
   NS_ASSERT (duration.IsPositive ());
   // energy = current * voltage * time
   double energyToDecreaseJ = (totalCurrentA * m_supplyVoltageV * duration.GetNanoSeconds ()) / 1e9;
-  NS_ASSERT (m_remainingEnergyJ >= energyToDecreaseJ);
+  // handles consuming energy below the low battery threshold
+  if (m_remainingEnergyJ <= m_energyCapacityJ * m_lowBatteryTh && energyToDecreaseJ > 0)
+    {
+      energyToDecreaseJ = 0;
+    }
+  // handles recharging above the energy capacity
+  if (m_remainingEnergyJ >= m_energyCapacityJ && energyToDecreaseJ < 0)
+    {
+      energyToDecreaseJ = 0;
+    }
   m_remainingEnergyJ -= energyToDecreaseJ;
   NS_LOG_DEBUG ("BasicEnergySource:Remaining energy = " << m_remainingEnergyJ);
 }

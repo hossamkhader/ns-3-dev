@@ -62,6 +62,13 @@ public:
   virtual double GetInitialEnergy (void) const;
 
   /**
+   * \return The source energy capacity, in Joules.
+   *
+   * Implements GetEnergyCapacity.
+   */
+  virtual double GetEnergyCapacity (void) const;
+
+  /**
    * \returns Supply voltage at the energy source.
    *
    * Implements GetSupplyVoltage.

@@ -92,6 +92,22 @@ public:
   void SetInitialEnergy (double initialEnergyJ);
 
   /**
+   * \return The source energy capacity, in Joules.
+   *
+   * Implements GetEnergyCapacity.
+   */
+  virtual double GetEnergyCapacity (void) const;
+
+  /**
+   * \param The source energy capacity, in Joules.
+   *
+   * Sets the energy capacity of the source.
+   * If the energy capacity is not set, it is assumed to be equal to
+   * the initial energy.
+   */
+  void SetEnergyCapacity (double energyCapacityJ);
+
+  /**
    * \returns Supply voltage at the energy source.
    *
    * Implements GetSupplyVoltage.
@@ -182,6 +198,7 @@ private:
 
 private:
   double m_initialEnergyJ;                // initial energy, in Joules
+  double m_energyCapacityJ;               // energy capacity, in Joules
   TracedValue<double> m_remainingEnergyJ; // remaining energy, in Joules
   double m_drainedCapacity;               // capacity drained from the cell, in Ah
   double m_supplyVoltageV;                // actual voltage of the cell

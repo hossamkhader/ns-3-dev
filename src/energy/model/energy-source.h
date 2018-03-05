@@ -102,12 +102,20 @@ public:
   virtual double GetInitialEnergy (void) const = 0;
 
   /**
+   *  \returns Energy capacity of the energy source.
+   *
+   *  Set method is to be defined in child class only if necessary. For sources
+   *  with a fixed energy capacity, set method is not needed.
+   */
+   virtual double GetEnergyCapacity (void) const = 0;
+
+  /**
    * \returns Remaining energy at the energy source.
    */
   virtual double GetRemainingEnergy (void) = 0;
 
   /**
-   * \return Energy fraction = remaining energy / initial energy [0, 1]
+   * \return Energy fraction = remaining energy / energy capacity [0, 1]
    *
    * This function returns the percentage of energy left in the energy source.
    */
