@@ -40,7 +40,7 @@ int main (int argc, char** argv)
 {
   CommandLine cmd;
   cmd.Parse (argc, argv);
-  
+
 #if 0
   LogComponentEnable ("Ping6Application", LOG_LEVEL_ALL);
   LogComponentEnable ("LrWpanMac",LOG_LEVEL_ALL);
@@ -50,7 +50,7 @@ int main (int argc, char** argv)
 #endif
 
   NodeContainer nodes;
-  nodes.Create(2);
+  nodes.Create (2);
 
   MobilityHelper mobility;
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
@@ -63,10 +63,10 @@ int main (int argc, char** argv)
                                  "LayoutType", StringValue ("RowFirst"));
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.Install (nodes);
-  
+
   LrWpanHelper lrWpanHelper;
   // Add and install the LrWpanNetDevice for each node
-  NetDeviceContainer lrwpanDevices = lrWpanHelper.Install(nodes);
+  NetDeviceContainer lrwpanDevices = lrWpanHelper.Install (nodes);
 
   // Fake PAN association and short address assignment.
   lrWpanHelper.AssociateToPan (lrwpanDevices, 0);
@@ -86,7 +86,7 @@ int main (int argc, char** argv)
   //std::cout<< deviceInterfaces.GetAddress(1,1)<<std::endl;
 
 
-   
+
   uint32_t packetSize = 10;
   uint32_t maxPacketCount = 5;
   Time interPacketInterval = Seconds (1.);
@@ -106,9 +106,9 @@ int main (int argc, char** argv)
   AsciiTraceHelper ascii;
   lrWpanHelper.EnableAsciiAll (ascii.CreateFileStream ("Ping-6LoW-lr-wpan.tr"));
   lrWpanHelper.EnablePcapAll (std::string ("Ping-6LoW-lr-wpan"), true);
-  
+
   Simulator::Stop (Seconds (10));
-  
+
   Simulator::Run ();
   Simulator::Destroy ();
 

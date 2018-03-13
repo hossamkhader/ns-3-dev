@@ -545,7 +545,7 @@ NS_OBJECT_ENSURE_REGISTERED (SixLowPanFrag1);
 
 SixLowPanFrag1::SixLowPanFrag1 ()
   : m_datagramSize (0),
-    m_datagramTag (0)
+  m_datagramTag (0)
 {
 }
 
@@ -632,8 +632,8 @@ NS_OBJECT_ENSURE_REGISTERED (SixLowPanFragN);
 
 SixLowPanFragN::SixLowPanFragN ()
   : m_datagramSize (0),
-    m_datagramTag (0),
-    m_datagramOffset (0)
+  m_datagramTag (0),
+  m_datagramOffset (0)
 {
 }
 /*

@@ -342,6 +342,12 @@ public:
      */
     void SetIpv6Address (Ipv6Address ipv6Address);
 
+protected:
+    /**
+     * \brief the NdiscCache associated.
+     */
+    NdiscCache* m_ndCache;
+
 private:
     /**
      * \brief The IPv6 address.
@@ -365,11 +371,6 @@ private:
      * \brief The state of the entry.
      */
     NdiscCacheEntryState_e m_state;
-
-    /**
-     * \brief the NdiscCache associated.
-     */
-    NdiscCache* m_ndCache;
 
     /**
      * \brief The MAC address.
@@ -402,6 +403,12 @@ private:
     uint8_t m_nsRetransmit;
   };
 
+protected:
+  /**
+   * \brief Dispose this object.
+   */
+  void DoDispose ();
+
 private:
   /**
    * \brief Neighbor Discovery Cache container
@@ -426,11 +433,6 @@ private:
    * \returns
    */
   NdiscCache& operator= (NdiscCache const &);
-
-  /**
-   * \brief Dispose this object.
-   */
-  void DoDispose ();
 
   /**
    * \brief The NetDevice.

@@ -161,6 +161,12 @@ void Icmpv6L4Protocol::SetNode (Ptr<Node> node)
   m_node = node;
 }
 
+Ptr<Node> Icmpv6L4Protocol::GetNode ()
+{
+  NS_LOG_FUNCTION (this);
+  return m_node;
+}
+
 uint16_t Icmpv6L4Protocol::GetStaticProtocolNumber ()
 {
   NS_LOG_FUNCTION_NOARGS ();

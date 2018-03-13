@@ -116,6 +116,12 @@ public:
   void SetNode (Ptr<Node> node);
 
   /**
+   * \brief Get the node.
+   * \return node
+   */
+  Ptr<Node> GetNode ();
+
+  /**
    * \brief This method is called by AddAgregate and completes the aggregation
    * by setting the node in the ICMPv6 stack and adding ICMPv6 factory to
    * IPv6 stack connected to the node.
@@ -199,7 +205,7 @@ public:
    * \param target target IPv6 address
    * \param hardwareAddress our mac address
    */
-  void SendNS (Ipv6Address src, Ipv6Address dst, Ipv6Address target, Address hardwareAddress);
+  virtual void SendNS (Ipv6Address src, Ipv6Address dst, Ipv6Address target, Address hardwareAddress);
 
   /**
    * \brief Send an error Destination Unreachable.
@@ -380,6 +386,31 @@ protected:
    */
   virtual void DoDispose ();
 
+  /**
+   * \brief Get the cache corresponding to the device.
+   * \param device the device
+   * \returns the NdiscCache associated with the device
+   */
+  Ptr<NdiscCache> FindCache (Ptr<NetDevice> device);
+
+  /**
+   * \brief Receive Neighbor Advertisement method.
+   * \param p the packet
+   * \param src source address
+   * \param dst destination address
+   * \param interface the interface from which the packet is coming
+   */
+  void HandleNA (Ptr<Packet> p, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface);
+
+  /**
+   * \brief Link layer address option processing.
+   * \param lla LLA option
+   * \param src source address
+   * \param dst destination address
+   * \param interface the interface from which the packet is coming
+   */
+  void ReceiveLLA (Icmpv6OptionLinkLayerAddress lla, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface);
+
 private:
   typedef std::list<Ptr<NdiscCache> > CacheList; //!< container of NdiscCaches
 
@@ -478,15 +509,6 @@ private:
   void HandleEchoRequest (Ptr<Packet> p, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface);
 
   /**
-   * \brief Receive Neighbor Advertisement method.
-   * \param p the packet
-   * \param src source address
-   * \param dst destination address
-   * \param interface the interface from which the packet is coming
-   */
-  void HandleNA (Ptr<Packet> p, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface);
-
-  /**
    * \brief Receive Redirection method.
    * \param p the packet
    * \param src source address
@@ -530,22 +552,6 @@ private:
    * \param interface the interface from which the packet is coming
    */
   void HandleParameterError (Ptr<Packet> p, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface);
-
-  /**
-   * \brief Link layer address option processing.
-   * \param lla LLA option
-   * \param src source address
-   * \param dst destination address
-   * \param interface the interface from which the packet is coming
-   */
-  void ReceiveLLA (Icmpv6OptionLinkLayerAddress lla, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface);
-
-  /**
-   * \brief Get the cache corresponding to the device.
-   * \param device the device
-   * \returns the NdiscCache associated with the device
-   */
-  Ptr<NdiscCache> FindCache (Ptr<NetDevice> device);
 
   // From IpL4Protocol
   virtual void SetDownTarget (IpL4Protocol::DownTargetCallback cb);
