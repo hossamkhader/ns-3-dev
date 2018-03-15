@@ -365,5 +365,53 @@ void Radvd::HandleRead (Ptr<Socket> socket)
     }
 }
 
+Ptr<Socket> Radvd::GetRecvSocket () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_recvSocket;
+}
+
+void Radvd::SetRecvSocket (Ptr<Socket> socket)
+{
+  NS_LOG_FUNCTION (this << socket);
+  m_recvSocket = socket;
+}
+
+std::map<uint32_t, Ptr<Socket> > Radvd::GetSendSockets () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_sendSockets;
+}
+
+void Radvd::SetSendSocket (uint32_t interface, Ptr<Socket> socket)
+{
+  NS_LOG_FUNCTION (this << interface);
+  m_sendSockets.insert (std::pair<uint32_t, Ptr<Socket> > (interface, socket));
+}
+
+std::map<uint32_t, EventId> Radvd::GetUnsolEventIds () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_unsolicitedEventIds;
+}
+
+std::map<uint32_t, EventId> Radvd::GetSolEventIds () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_solicitedEventIds;
+}
+
+void Radvd::SetSolEventId (uint32_t interface, EventId event)
+{
+  NS_LOG_FUNCTION (this << interface);
+  m_solicitedEventIds.insert (std::pair<uint32_t, EventId> (interface, event));
+}
+
+Ptr<UniformRandomVariable> Radvd::GetJitter () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_jitter;
+}
+
 } /* namespace ns3 */
 

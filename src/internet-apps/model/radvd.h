@@ -102,6 +102,56 @@ protected:
    */
   virtual void DoDispose ();
 
+  /**
+   * \brief Get the raw socket to receive RS.
+   * \return receive socket
+   */
+  Ptr<Socket> GetRecvSocket () const;
+
+  /**
+   * \brief Set the raw socket to receive RS.
+   * \param socket the receive socket
+   */
+  void SetRecvSocket (Ptr<Socket> socket);
+
+  /**
+   * \brief Get the map of raw socket to send RA.
+   * \return send sockets
+   */
+  std::map<uint32_t, Ptr<Socket> > GetSendSockets () const;
+
+  /**
+   * \brief Set the raw socket to send RA.
+   * \param interface the interface number
+   * \param socket the receive socket
+   */
+  void SetSendSocket (uint32_t interface, Ptr<Socket> socket);
+
+  /**
+   * \brief Get the Event ID map for unsolicited RAs.
+   * \return the Event ID map
+   */
+  std::map<uint32_t, EventId> GetUnsolEventIds () const;
+
+  /**
+   * \brief Get the Event ID map for solicited RAs.
+   * \return the Event ID map
+   */
+  std::map<uint32_t, EventId> GetSolEventIds () const;
+
+  /**
+   * \brief Set the Event ID for solicited RAs.
+   * \param interface the interface number
+   * \param event the EventId
+   */
+  void SetSolEventId (uint32_t interface, EventId event);
+
+  /**
+   * \brief Get the variable to provide jitter in advertisement interval.
+   * \return the variable
+   */
+  Ptr<UniformRandomVariable> GetJitter () const;
+
 private:
   /// Container: Ptr to RadvdInterface
   typedef std::list<Ptr<RadvdInterface> > RadvdInterfaceList;
@@ -146,7 +196,7 @@ private:
    * \brief Handle received packet, especially router solicitation
    * \param socket socket to read data from
    */
-  void HandleRead (Ptr<Socket> socket);
+  virtual void HandleRead (Ptr<Socket> socket);
 
   /**
    * \brief Raw socket to receive RS.
