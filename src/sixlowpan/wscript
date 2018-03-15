@@ -10,13 +10,10 @@ def build(bld):
         'model/sixlowpan-ndisc-ra-options.cc',
         'model/sixlowpan-nd-header.cc',
         'model/sixlowpan-nd-protocol.cc',
-<<<<<<< HEAD
         'model/sixlowpan-radvd.cc',
         'model/sixlowpan-radvd-context.cc',
         'model/sixlowpan-radvd-dad-entry.cc',
         'model/sixlowpan-radvd-interface.cc',
-=======
->>>>>>> branch '6lowpan' of https://github.com/hossamkhader/ns-3-dev.git
         'helper/sixlowpan-helper.cc',
         ]
 
@@ -36,13 +33,10 @@ def build(bld):
         'model/sixlowpan-ndisc-ra-options.h',
         'model/sixlowpan-nd-header.h',
         'model/sixlowpan-nd-protocol.h',
-<<<<<<< HEAD
         'model/sixlowpan-radvd.h',
         'model/sixlowpan-radvd-context.h',
         'model/sixlowpan-radvd-dad-entry.h',
         'model/sixlowpan-radvd-interface.h',
-=======
->>>>>>> branch '6lowpan' of https://github.com/hossamkhader/ns-3-dev.git
         'helper/sixlowpan-helper.h',
         ]
 
